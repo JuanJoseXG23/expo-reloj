@@ -110,6 +110,7 @@ describe('sessions', () => {
   });
   it('el expositor sí la controla', async () => {
     await assertSucceeds(setDoc(doc(db('profe'), `sessions/${SID}`), { ...baseSession, currentBlock: 1, updatedAt: serverTimestamp() }));
+    await assertSucceeds(setDoc(doc(db('profe'), `sessions/${SID}`), { ...baseSession, doneQuizzes: ['b1-tic'] }));
   });
   it('el expositor no puede escribir valores inválidos', async () => {
     await assertFails(setDoc(doc(db('profe'), `sessions/${SID}`), { ...baseSession, status: 'hackeado' }));

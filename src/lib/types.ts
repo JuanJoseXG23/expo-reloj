@@ -17,6 +17,8 @@ export interface SessionState {
   quizState: QuizState;
   showRanking: boolean;
   ranking: RankingEntry[];
+  /** preguntas cuyos resultados ya se mostraron (se pueden repasar). */
+  doneQuizzes: string[];
   /** ms desde epoch; null si no ha empezado. */
   startedAt: number | null;
 }
@@ -31,6 +33,7 @@ export const DEFAULT_SESSION: SessionState = {
   quizState: 'idle',
   showRanking: false,
   ranking: [],
+  doneQuizzes: [],
   startedAt: null,
 };
 

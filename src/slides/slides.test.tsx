@@ -10,6 +10,7 @@ describe('pantallas', () => {
     DEFAULT_SESSION,
     { ...DEFAULT_SESSION, status: 'live' as const, activeQuizId: 'gancho', quizState: 'results' as const },
     { ...DEFAULT_SESSION, status: 'ended' as const, showRanking: true, ranking: [{ name: 'Ana', points: 3 }] },
+    { ...DEFAULT_SESSION, status: 'live' as const, doneQuizzes: ['b1-tic', 'b2-q', 'b3-tics'], activeQuizId: 'b1-flanco', quizState: 'open' as const },
   ];
   for (const b of BLOCKS) {
     for (const [i, s] of b.slides.entries()) {

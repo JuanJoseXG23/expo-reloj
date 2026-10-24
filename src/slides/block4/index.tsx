@@ -4,6 +4,7 @@ import { Btn, SlideFrame, Ves } from '../../components/ui';
 import { Confetti } from '../../components/ui/Confetti';
 import { useAnimTime } from '../../hooks/useAnimTime';
 import { useSlide } from '../SlideContext';
+import { getQuiz } from '../../content/quizzes';
 
 // 4.1 Tres frases
 const PHRASES = [
@@ -45,6 +46,7 @@ export function TresFrases() {
 export function PreguntaFinal() {
   const { session } = useSlide();
   const live = session.activeQuizId === 'final' && session.quizState !== 'idle';
+  const done = session.status === 'ended' || session.doneQuizzes.includes('final');
   return (
     <SlideFrame emoji="🏁" title="Pregunta final">
       <div className="rounded-3xl bg-navy text-white p-6 text-center space-y-3">
@@ -54,7 +56,11 @@ export function PreguntaFinal() {
         <div className="text-2xl sm:text-3xl font-bold">+ 🐢 1 tic de espera</div>
         <div className="text-xl sm:text-2xl font-semibold opacity-90">¿Cuánto tarda la lectura?</div>
       </div>
-      <Ves>{live ? 'Responde en la tarjeta de pregunta 👆' : 'Prepárate… 👀'}</Ves>
+      {done ? (
+        <Ves tone="green">✓ {getQuiz('final')?.explain}</Ves>
+      ) : (
+        <Ves>{live ? 'Responde en la tarjeta de pregunta 👆' : 'Prepárate… 👀'}</Ves>
+      )}
     </SlideFrame>
   );
 }

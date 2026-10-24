@@ -50,7 +50,7 @@ service cloud.firestore {
       function validSession(d) {
         return d.keys().hasOnly(['status', 'unlockedBlocks', 'currentBlock', 'currentSlide',
                                  'currentSpeaker', 'activeQuizId', 'quizState', 'showRanking',
-                                 'ranking', 'startedAt', 'updatedAt'])
+                                 'ranking', 'doneQuizzes', 'startedAt', 'updatedAt'])
           && d.keys().hasAll(['status', 'unlockedBlocks', 'currentBlock', 'currentSlide',
                               'currentSpeaker', 'activeQuizId', 'quizState', 'showRanking'])
           && d.status in ['lobby', 'live', 'ended']
@@ -61,7 +61,8 @@ service cloud.firestore {
           && (d.activeQuizId == null || d.activeQuizId is string)
           && d.quizState in ['idle', 'open', 'closed', 'results']
           && d.showRanking is bool
-          && (!('ranking' in d) || d.ranking is list);
+          && (!('ranking' in d) || d.ranking is list)
+          && (!('doneQuizzes' in d) || d.doneQuizzes is list);
       }
 
       allow read: if signedIn();

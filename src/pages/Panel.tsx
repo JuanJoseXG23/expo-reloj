@@ -78,6 +78,7 @@ function Dashboard() {
         quizState: 'idle',
         showRanking: false,
         ranking: [],
+        doneQuizzes: [],
         startedAt: 'now',
       }),
     );
@@ -107,7 +108,23 @@ function Dashboard() {
     getQuiz(slide?.quizId) ?? blockQuizzes.find((q) => !answeredIds.has(q.id)) ?? blockQuizzes[0];
 
   const launch = useCallback((id: string) => run(update({ activeQuizId: id, quizState: 'open' })), [update, run]);
-  const setQuizState = useCallback((quizState: 'closed' | 'results') => run(update({ quizState })), [update, run]);
+  /** Muestra resultados de una pregunta y la marca como hecha (queda para repasar en su Mini-quiz). */
+  const showResults = useCallback(
+    (id: string) =>
+      run(
+        update({
+          activeQuizId: id,
+          quizState: 'results',
+          doneQuizzes: S.doneQuizzes.includes(id) ? S.doneQuizzes : [...S.doneQuizzes, id],
+        }),
+      ),
+    [S.doneQuizzes, update, run],
+  );
+  const setQuizState = useCallback(
+    (quizState: 'closed' | 'results') =>
+      quizState === 'results' && S.activeQuizId ? showResults(S.activeQuizId) : run(update({ quizState })),
+    [S.activeQuizId, showResults, update, run],
+  );
   const hideQuiz = () => run(update({ activeQuizId: null, quizState: 'idle' }));
 
   const ranking = useMemo(() => computeRanking(answers), [answers]);
@@ -300,7 +317,7 @@ function Dashboard() {
                 onlineCount={online.length}
                 onLaunch={() => launch(q.id)}
                 onClose={() => setQuizState('closed')}
-                onResults={() => (S.activeQuizId === q.id ? setQuizState('results') : run(update({ activeQuizId: q.id, quizState: 'results' })))}
+                onResults={() => showResults(q.id)}
                 onHide={hideQuiz}
               />
             ))}

@@ -61,6 +61,7 @@ export function normalize(data: Record<string, unknown> | undefined): SessionSta
     ...DEFAULT_SESSION,
     ...(data as Partial<SessionState>),
     ranking: Array.isArray(data.ranking) ? (data.ranking as SessionState['ranking']) : [],
+    doneQuizzes: Array.isArray(data.doneQuizzes) ? (data.doneQuizzes as string[]) : [],
     startedAt,
   };
 }

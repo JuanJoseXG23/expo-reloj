@@ -110,7 +110,10 @@ function Screen() {
               </div>
               <h2 className="text-4xl font-extrabold leading-tight text-navy">{quiz.question}</h2>
               {S.quizState === 'results' ? (
-                <ResultBars quiz={quiz} counts={counts} big />
+                <>
+                  <ResultBars quiz={quiz} counts={counts} big />
+                  <div className="rounded-2xl bg-azul/10 px-5 py-3 text-2xl font-bold text-navy">💡 {quiz.explain}</div>
+                </>
               ) : (
                 <QuizOptions quiz={quiz} selected={null} disabled />
               )}

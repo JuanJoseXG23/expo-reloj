@@ -64,7 +64,10 @@ export function QuizCard({ session, uid, name }: { session: SessionState; uid: s
       <h3 className="mt-2 text-xl font-extrabold text-navy leading-snug">{quiz.question}</h3>
       <div className="mt-3">
         {showResults ? (
-          <ResultBars quiz={quiz} counts={counts} />
+          <>
+            <ResultBars quiz={quiz} counts={counts} />
+            <div className="mt-2 rounded-2xl bg-azul/10 px-3 py-2 font-bold text-navy">💡 {quiz.explain}</div>
+          </>
         ) : (
           <QuizOptions quiz={quiz} selected={selected} disabled={state !== 'open'} onPick={pick} />
         )}
