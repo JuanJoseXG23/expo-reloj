@@ -1,0 +1,123 @@
+rules_version = '2';
+
+// Reglas de seguridad de la exposición "Señales de reloj y diagramas de tiempo".
+// La configuración web de Firebase es pública: estas reglas son la verdadera seguridad.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Ayudantes ──────────────────────────────────────────────────────────────
+
+    // Toda petición necesita la sesión anónima invisible.
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Es expositor quien ya tiene su documento en /presenters (solo se crea con la clave correcta).
+    function isPresenter() {
+      return signedIn() && exists(/databases/$(database)/documents/presenters/$(request.auth.uid));
+    }
+
+    function session(sessionId) {
+      return get(/databases/$(database)/documents/sessions/$(sessionId)).data;
+    }
+
+    function validName(n) {
+      return n is string && n.size() >= 2 && n.size() <= 40 && !n.matches('.*[<>].*');
+    }
+
+    // ── config/secret: nadie lo lee ni lo escribe desde la app ────────────────
+    match /config/{docId} {
+      allow read, write: if false;
+    }
+
+    // ── presenters/{uid}: se crea solo con la clave correcta ──────────────────
+    match /presenters/{uid} {
+      // El propio expositor puede leer su documento para saber si ya está validado.
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'key', 'createdAt'])
+        && request.resource.data.keys().hasAll(['name', 'key'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 40
+        && request.resource.data.key is string
+        && request.resource.data.key == get(/databases/$(database)/documents/config/secret).data.presenterKey;
+      allow list, update, delete: if false;
+    }
+
+    // ── sessions/{sessionId}: todos leen, solo expositores escriben ──────────
+    match /sessions/{sessionId} {
+      function validSession(d) {
+        return d.keys().hasOnly(['status', 'unlockedBlocks', 'currentBlock', 'currentSlide',
+                                 'currentSpeaker', 'activeQuizId', 'quizState', 'showRanking',
+                                 'ranking', 'startedAt', 'updatedAt'])
+          && d.keys().hasAll(['status', 'unlockedBlocks', 'currentBlock', 'currentSlide',
+                              'currentSpeaker', 'activeQuizId', 'quizState', 'showRanking'])
+          && d.status in ['lobby', 'live', 'ended']
+          && d.unlockedBlocks is list
+          && d.currentBlock is int && d.currentBlock >= 0 && d.currentBlock <= 4
+          && d.currentSlide is int && d.currentSlide >= 0
+          && d.currentSpeaker in ['Juan José', 'Cristian', 'Renzo', 'Los tres']
+          && (d.activeQuizId == null || d.activeQuizId is string)
+          && d.quizState in ['idle', 'open', 'closed', 'results']
+          && d.showRanking is bool
+          && (!('ranking' in d) || d.ranking is list);
+      }
+
+      allow read: if signedIn();
+      allow create, update: if isPresenter() && validSession(request.resource.data);
+      allow delete: if isPresenter();
+
+      // ── participants/{uid}: cada quien escribe el suyo; todos leen ─────────
+      match /participants/{uid} {
+        allow read: if signedIn();
+        allow create, update: if signedIn()
+          && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['name', 'joinedAt', 'lastSeen'])
+          && request.resource.data.keys().hasAll(['name', 'joinedAt', 'lastSeen'])
+          && validName(request.resource.data.name)
+          && request.resource.data.joinedAt is timestamp
+          && request.resource.data.lastSeen is timestamp;
+        allow delete: if (signedIn() && request.auth.uid == uid) || isPresenter();
+      }
+
+      // ── answers/{quizId_uid}: una respuesta por estudiante y pregunta ──────
+      match /answers/{docId} {
+        function canAnswer() {
+          let s = session(sessionId);
+          let d = request.resource.data;
+          return signedIn()
+            && d.keys().hasOnly(['uid', 'name', 'quizId', 'option', 'correct', 'answeredAt'])
+            && d.keys().hasAll(['uid', 'name', 'quizId', 'option', 'correct', 'answeredAt'])
+            && d.uid == request.auth.uid
+            && d.quizId is string
+            && docId == d.quizId + '_' + request.auth.uid
+            && validName(d.name)
+            && d.option is int && d.option >= 0 && d.option <= 3
+            && d.correct is bool
+            && d.answeredAt == request.time
+            && s.quizState == 'open'
+            && s.activeQuizId == d.quizId;
+        }
+
+        allow create, update: if canAnswer();
+
+        // Siempre puedo leer MI respuesta (el id termina en "_<mi uid>").
+        // Las de los demás solo cuando la pregunta activa está en "resultados".
+        // Los expositores leen todo.
+        allow read: if isPresenter()
+          || (signedIn() && docId.matches('^.+_' + request.auth.uid + '$'))
+          || (signedIn()
+              && session(sessionId).quizState == 'results'
+              && resource.data.quizId == session(sessionId).activeQuizId);
+
+        allow delete: if isPresenter();
+      }
+    }
+
+    // Cualquier otra ruta: prohibida.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

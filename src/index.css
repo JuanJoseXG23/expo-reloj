@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: #eaf1f8;
+  color: #1f3a5f;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: Inter, system-ui, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100dvh;
+}
+
+button {
+  touch-action: manipulation;
+}
+
+/* Confeti */
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  border-radius: 2px;
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+  animation-fill-mode: forwards;
+}
+@keyframes confetti-fall {
+  0% {
+    transform: translate(0, 0) rotate(var(--rot));
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--drift), 105vh) rotate(calc(var(--rot) + 720deg));
+    opacity: 0.8;
+  }
+}
+
+/* Barras de resultados animadas */
+.bar-grow {
+  transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Punto "EN VIVO" */
+.live-dot {
+  animation: live-pulse 1.4s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Pulso que viaja por un cable (bloque 1.4) */
+.pulse-track {
+  position: relative;
+  overflow: hidden;
+}
+.pulse-track > span {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border-radius: 9999px;
+  background: #d35400;
+  animation: pulse-flow 1.2s linear infinite;
+}
+@keyframes pulse-flow {
+  0% {
+    left: -10px;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop,
+  .confetti-piece,
+  .live-dot {
+    animation: none !important;
+  }
+}
