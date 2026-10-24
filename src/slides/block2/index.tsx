@@ -297,8 +297,10 @@ export function LlegasteTarde() {
     const el = wrap.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    const svgX = ((e.clientX - r.left) / r.width) * META.width;
-    const plotW = META.width - META.label - 8;
+    // El diagrama dibuja 1 unidad por px (máx. 640): convertimos el dedo a esas unidades.
+    const units = Math.max(120, Math.min(640, r.width));
+    const svgX = ((e.clientX - r.left) / r.width) * units;
+    const plotW = units - META.label - 8;
     const t = META.from + ((svgX - META.label) / plotW) * (META.to - META.from);
     setTD(Math.min(META.to - 0.1, Math.max(META.from + 0.1, Math.round(t * 20) / 20)));
   };

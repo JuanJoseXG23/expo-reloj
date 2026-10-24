@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { clockEvents, risingEdges, toSegments, type Level, type SignalDef } from './wave';
 
 export interface Phase {
@@ -70,7 +70,7 @@ export function TimingDiagram({
   signals,
   from,
   to,
-  width = 520,
+  width: preferredWidth = 520,
   rowHeight = 50,
   labelWidth = 72,
   phases,
@@ -87,6 +87,10 @@ export function TimingDiagram({
   children,
 }: TimingDiagramProps) {
   const uid = useId().replace(/:/g, '');
+  const box = useRef<HTMLDivElement>(null);
+  const measured = useMeasuredWidth(box);
+  // 1 unidad = 1 px real en el celular (la letra no se encoge); en pantallas grandes se agranda.
+  const width = measured ? Math.max(MIN_W, Math.min(MAX_W, measured)) : preferredWidth;
   const lw = hideLabels ? 6 : labelWidth;
   const plotW = width - lw - 8;
   const header = phases && phases.length ? 30 : 8;
@@ -101,6 +105,7 @@ export function TimingDiagram({
   const revealX = revealUntil === undefined ? width : clampX(revealUntil);
 
   return (
+    <div ref={box} className="w-full">
     <svg
       viewBox={`0 0 ${width} ${height}`}
       className={`w-full h-auto select-none ${className}`}
@@ -241,6 +246,7 @@ export function TimingDiagram({
 
       {children?.({ x, rowTop, height })}
     </svg>
+    </div>
   );
 
   function renderSignal(s: SignalDef, i: number): ReactNode {
@@ -319,18 +325,41 @@ export function TimingDiagram({
       const left = seg.from <= from ? 0 : s;
       const right = seg.to >= to ? 0 : s;
       const d = `M${a},${mid} L${a + left},${top} L${b - right},${top} L${b},${mid} L${b - right},${bot} L${a + left},${bot} Z`;
+      // En pantallas angostas, abreviar ("Dirección" → "Dir.") antes que ocultar el texto.
+      const fits = (txt: string) => b - a > txt.length * 7.5 + 10;
+      const short = seg.value.length > 4 ? `${seg.value.slice(0, 3)}.` : seg.value;
+      const label = fits(seg.value) ? seg.value : fits(short) ? short : null;
       return (
         <g key={k}>
           <path d={d} fill={color} fillOpacity={0.12} stroke={color} strokeWidth={2.5} strokeLinejoin="round" />
-          {b - a > seg.value.length * 7 + 10 && (
+          {label && (
             <text x={(a + b) / 2} y={mid + 5} textAnchor="middle" fontSize={13} fontWeight={700} fill={color}>
-              {seg.value}
+              {label}
             </text>
           )}
         </g>
       );
     });
   }
+}
+
+const MIN_W = 120;
+const MAX_W = 640;
+
+/** Ancho real del contenedor en px (null hasta medirlo). */
+function useMeasuredWidth(ref: React.RefObject<HTMLDivElement>) {
+  const [w, setW] = useState<number | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(([entry]) => {
+      const next = Math.round(entry.contentRect.width);
+      if (next > 0) setW((prev) => (prev === next ? prev : next));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref]);
+  return w;
 }
 
 function zigzag(a: number, b: number, top: number, bottom: number): string {
