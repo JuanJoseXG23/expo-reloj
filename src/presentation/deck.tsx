@@ -876,6 +876,10 @@ function D43() {
             </div>
           ))}
         </div>
+      ) : session.showRanking ? (
+        <div className="grid h-full place-items-center text-center text-[48px] font-extrabold text-slate-400">
+          Todavía nadie ha respondido preguntas 🤷
+        </div>
       ) : (
         <div className="grid h-full place-items-center text-[60px] font-extrabold text-slate-400">🥁 Muy pronto…</div>
       )}

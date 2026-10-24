@@ -76,7 +76,7 @@ export function Top5() {
     return (
       <SlideFrame emoji="🏆" title="Top 5">
         <div className="rounded-3xl bg-white ring-1 ring-slate-200 p-10 text-center text-2xl font-bold text-slate-400">
-          🥁 Muy pronto…
+          {session.showRanking ? 'Todavía nadie ha respondido preguntas 🤷' : '🥁 Muy pronto…'}
         </div>
       </SlideFrame>
     );

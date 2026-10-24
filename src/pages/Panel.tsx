@@ -130,13 +130,13 @@ function Dashboard() {
   const hideQuiz = () => run(update({ activeQuizId: null, quizState: 'idle' }));
 
   const ranking = useMemo(() => computeRanking(answers), [answers]);
-  const toggleRanking = () =>
-    run(
-      update({
-        showRanking: !S.showRanking,
-        ranking: ranking.slice(0, 5).map(({ name, points }) => ({ name, points })),
-      }),
-    );
+  const top5 = useMemo(() => ranking.slice(0, 5).map(({ name, points }) => ({ name, points })), [ranking]);
+  const toggleRanking = () => run(update({ showRanking: !S.showRanking, ranking: top5 }));
+
+  // Mientras el Top 5 está visible, se mantiene al día solo (si llega una respuesta tarde, se actualiza).
+  useEffect(() => {
+    if (S.showRanking && !meta.local && JSON.stringify(top5) !== JSON.stringify(S.ranking)) run(update({ ranking: top5 }));
+  }, [S.showRanking, S.ranking, top5, meta.local, update, run]);
 
   // ── Atajos de teclado ──
   useEffect(() => {
@@ -349,7 +349,8 @@ function Dashboard() {
                 <span>{r.points} pts</span>
               </div>
             ))}
-            {S.showRanking && <p className="text-xs text-slate-500">Para actualizarlo, ocúltalo y vuelve a mostrarlo.</p>}
+            {ranking.length === 0 && <p className="text-sm text-slate-500">Aún no hay respuestas: el Top 5 se llena con las preguntas.</p>}
+            {S.showRanking && <p className="text-xs text-slate-500">Visible para todos · se actualiza solo.</p>}
           </Card>
 
           {/* Conectados */}
