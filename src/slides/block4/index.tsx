@@ -5,12 +5,13 @@ import { Confetti } from '../../components/ui/Confetti';
 import { useAnimTime } from '../../hooks/useAnimTime';
 import { useSlide } from '../SlideContext';
 import { getQuiz } from '../../content/quizzes';
+import { PROFESSOR, TEAM } from '../../content/people';
 
 // 4.1 Tres frases
 const PHRASES = [
-  { who: 'Juan José', icon: '⏱️', text: 'El reloj marca el ritmo de todo.' },
-  { who: 'Cristian', icon: '📈', text: 'Los diagramas de tiempo nos dejan ver cada tic.' },
-  { who: 'Renzo', icon: '💻', text: 'En ensamblador, cada instrucción cuesta tics de reloj.' },
+  { who: TEAM[0].full, icon: '⏱️', text: 'El reloj marca el ritmo de todo.' },
+  { who: TEAM[1].full, icon: '📈', text: 'Los diagramas de tiempo nos dejan ver cada tic.' },
+  { who: TEAM[2].full, icon: '💻', text: 'En ensamblador, cada instrucción cuesta tics de reloj.' },
 ];
 
 export function TresFrases() {
@@ -110,7 +111,12 @@ export function Gracias() {
       {party > 0 && <Confetti key={party} />}
       <div className="text-7xl">🙌</div>
       <h2 className="text-5xl sm:text-6xl font-extrabold text-navy">¡Gracias!</h2>
-      <p className="text-lg font-semibold text-slate-600">Juan José · Cristian · Renzo</p>
+      <div className="text-lg font-semibold text-slate-600">
+        {TEAM.map((p) => (
+          <div key={p.short}>{p.full}</div>
+        ))}
+        <div className="mt-1 text-sm text-slate-500">Docente: {PROFESSOR}</div>
+      </div>
       <div className="w-full max-w-md">
         <TimingDiagram from={t} to={t + 5} hideLabels rowHeight={50} signals={[{ kind: 'clock', name: 'CLK', period: 1, marks: true }]} />
       </div>

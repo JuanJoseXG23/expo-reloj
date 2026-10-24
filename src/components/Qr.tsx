@@ -2,6 +2,7 @@ import { QRCodeSVG } from 'qrcode.react';
 
 /** Enlace de entrada para los estudiantes (la raíz del sitio). */
 export function joinUrl(): string {
+  if (typeof window === 'undefined') return 'https://juanjosexg23.github.io/expo-reloj/#/';
   return `${window.location.origin}${window.location.pathname}#/`;
 }
 

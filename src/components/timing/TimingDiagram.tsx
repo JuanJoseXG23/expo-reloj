@@ -46,6 +46,8 @@ export interface TimingDiagramProps {
   /** filas que tiemblan (metaestabilidad). */
   shakeRows?: number[];
   hideLabels?: boolean;
+  /** ancho máximo en unidades: menos unidades = letra más grande en pantallas anchas. */
+  maxUnits?: number;
   className?: string;
   ariaLabel?: string;
   children?: (helpers: { x: (t: number) => number; rowTop: (i: number) => number; height: number }) => ReactNode;
@@ -82,6 +84,7 @@ export function TimingDiagram({
   onRowClick,
   shakeRows = [],
   hideLabels = false,
+  maxUnits = MAX_W,
   className = '',
   ariaLabel = 'Diagrama de tiempo',
   children,
@@ -90,7 +93,7 @@ export function TimingDiagram({
   const box = useRef<HTMLDivElement>(null);
   const measured = useMeasuredWidth(box);
   // 1 unidad = 1 px real en el celular (la letra no se encoge); en pantallas grandes se agranda.
-  const width = measured ? Math.max(MIN_W, Math.min(MAX_W, measured)) : preferredWidth;
+  const width = measured ? Math.max(MIN_W, Math.min(maxUnits, measured)) : preferredWidth;
   const lw = hideLabels ? 6 : labelWidth;
   const plotW = width - lw - 8;
   const header = phases && phases.length ? 30 : 8;
@@ -172,7 +175,17 @@ export function TimingDiagram({
           <g key={`rg${i}`}>
             <rect x={a} y={top} width={Math.max(0, b - a)} height={bottom - top} fill={r.color} opacity={r.opacity ?? 0.22} />
             {r.label && (
-              <text x={(a + b) / 2} y={top + 13} textAnchor="middle" fontSize={12} fontWeight={700} fill={r.color}>
+              <text
+                x={(a + b) / 2}
+                y={top + 13}
+                textAnchor="middle"
+                fontSize={12}
+                fontWeight={700}
+                fill={r.color}
+                stroke="#fff"
+                strokeWidth={3}
+                paintOrder="stroke"
+              >
                 {r.label}
               </text>
             )}

@@ -165,14 +165,14 @@ function Dashboard() {
         <StatusPill status={S.status} />
         <Timer startedAt={S.startedAt} block={S.currentBlock} compact />
         <span className="flex-1" />
-        <Link to="/presentar" target="_blank" className="rounded-xl bg-white/10 px-3 py-1.5 text-sm font-bold">
-          📽️ Abrir /presentar
+        <Link to="/presentacion" target="_blank" className="rounded-xl bg-white/10 px-3 py-1.5 text-sm font-bold">
+          📽️ Abrir presentación
         </Link>
         {firebaseConfigured && (
           <button
             onClick={() => setLocalMode(!meta.local)}
             className={`rounded-xl px-3 py-1.5 text-sm font-bold ${meta.local ? 'bg-naranja' : 'bg-white/10'}`}
-            title="Plan B sin internet: el panel y /presentar (en este mismo navegador) funcionan sin Firestore"
+            title="Plan B sin internet: el panel y la presentación (en este mismo navegador) funcionan sin Firestore"
           >
             {meta.local ? '📴 Modo local ON' : '📶 En línea'}
           </button>
@@ -181,7 +181,7 @@ function Dashboard() {
 
       {meta.local && (
         <div className="bg-naranja/10 px-4 py-2 text-sm font-bold text-naranja">
-          Modo local (plan B): los cambios solo se ven en este navegador (panel + /presentar). Los celulares no se actualizan.
+          Modo local (plan B): los cambios solo se ven en este navegador (panel + presentación). Los celulares no se actualizan.
         </div>
       )}
       {(error || meta.error) && <div className="bg-rojo/10 px-4 py-2 text-sm font-bold text-rojo">⚠️ {error ?? meta.error}</div>}

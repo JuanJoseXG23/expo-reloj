@@ -3,6 +3,7 @@ import { TimingDiagram } from '../../components/timing/TimingDiagram';
 import { Btn, SlideFrame, Ves } from '../../components/ui';
 import { useAnimTime } from '../../hooks/useAnimTime';
 import { useSlide } from '../SlideContext';
+import { COURSE, PROFESSOR, SCHOOL, TEAM } from '../../content/people';
 
 // 0.1 Portada
 export function Portada() {
@@ -10,7 +11,7 @@ export function Portada() {
   return (
     <div className="flex flex-col items-center text-center gap-5 py-4 animate-pop">
       <span className="rounded-full bg-navy/10 px-4 py-1 text-sm font-bold text-azul">
-        Sistemas Digitales y Ensambladores
+        {COURSE}
       </span>
       <h1 className="text-4xl sm:text-6xl font-extrabold text-navy leading-tight">
         Señales de reloj <span className="text-naranja">y</span> diagramas de tiempo
@@ -25,14 +26,16 @@ export function Portada() {
           signals={[{ kind: 'clock', name: 'CLK', period: 1, marks: true }]}
         />
       </div>
-      <div className="flex flex-wrap justify-center gap-2">
-        {['Juan José', 'Cristian', 'Renzo'].map((n) => (
-          <span key={n} className="rounded-2xl bg-white px-4 py-2 font-bold text-navy ring-1 ring-slate-200">
-            {n}
+      <div className="flex flex-col items-center gap-1">
+        {TEAM.map((p) => (
+          <span key={p.short} className="font-bold text-navy">
+            {p.full}
           </span>
         ))}
       </div>
-      <p className="text-slate-500 font-semibold">Politécnico Grancolombiano · Intel 8086</p>
+      <p className="text-slate-500 font-semibold">
+        Docente: {PROFESSOR} · {SCHOOL}
+      </p>
     </div>
   );
 }
@@ -106,9 +109,9 @@ export function Puente() {
 
 // 0.4 Lo que veremos
 const AGENDA = [
-  { icon: '⏱️', title: 'El reloj', who: 'Juan José', text: 'El ritmo de todo.' },
-  { icon: '📈', title: 'Diagramas', who: 'Cristian', text: 'Ver cada tic dibujado.' },
-  { icon: '💻', title: 'Ensamblador', who: 'Renzo', text: 'Cada instrucción cuesta tics.' },
+  { icon: '⏱️', title: 'El reloj', who: TEAM[0].full, text: 'El ritmo de todo.' },
+  { icon: '📈', title: 'Diagramas', who: TEAM[1].full, text: 'Ver cada tic dibujado.' },
+  { icon: '💻', title: 'Ensamblador', who: TEAM[2].full, text: 'Cada instrucción cuesta tics.' },
 ];
 
 export function Agenda() {

@@ -1,11 +1,12 @@
 # ⏱️ Señales de reloj y diagramas de tiempo
 
-App web en tiempo real para acompañar la exposición de **Juan José, Cristian y Renzo**
-(Sistemas Digitales y Ensambladores · Politécnico Grancolombiano · Intel 8086).
+App web en tiempo real para acompañar la exposición de **Juan José Gómez Roldán, Cristian Murillo Ramírez y Renzo Olivieri García**
+(Sistemas Digitales y Ensambladores · Politécnico Grancolombiano · docente Jaime Andrés Zurita López · Intel 8086).
 
 - **Estudiantes:** abren el enlace (o el QR), escriben su nombre y entran. Nada más.
 - **Expositores:** controlan todo desde `/#/panel`: desbloquean bloques, cambian pantallas y lanzan preguntas.
-- **Video beam:** `/#/presentar` muestra la pantalla actual en grande, el QR en el lobby y los resultados.
+- **Video beam (perfil "presentación"):** `/#/presentacion` muestra **diapositivas** sincronizadas con la pantalla interactiva
+  que tienen los estudiantes: cuando el expositor avanza, cambian las dos. En el lobby muestra el QR y los conectados con avatares.
 
 Stack: Vite + React + TypeScript + Tailwind + Firebase (Auth anónima + Firestore). Se publica gratis en GitHub Pages.
 
@@ -200,14 +201,17 @@ escribe **`TU_USUARIO.github.io`** → Agregar.
 |---|---|---|
 | Estudiantes | `https://TU_USUARIO.github.io/expo-reloj/` | Nombre → Entrar → sala en vivo |
 | Expositores | `…/expo-reloj/#/panel` | Panel de control |
-| Video beam | `…/expo-reloj/#/presentar` | Pantalla grande + QR + resultados |
+| Video beam | `…/expo-reloj/#/presentacion` (o escribir **presentacion** como nombre al entrar) | Diapositivas + QR + avatares + resultados |
+| Ensayo | `…/expo-reloj/#/presentacion/ensayo` | Recorre las diapositivas con ← → sin tocar la sesión en vivo |
 
 **Para entrar como expositor** hay dos formas (solo la primera vez en cada dispositivo):
 - En la pantalla de entrada, escribe **`ADMIN123`** como si fuera tu nombre → te lleva al panel.
 - O abre `/#/panel`, elige tu nombre y escribe la clave.
 
 **Flujo:**
-1. Abre `/#/presentar` en el video beam (doble clic = pantalla completa). Se ve el QR.
+1. En el portátil del video beam abre la página y escribe **presentacion** como nombre (o abre `/#/presentacion`).
+   Doble clic = pantalla completa. Se ve el QR y, a medida que entran, los avatares de los compañeros.
+   Si en ese portátil también validan `ADMIN123`, durante las preguntas se ve además "N de M respondieron" en vivo.
 2. En el panel: **▶ Iniciar** → se desbloquea el Bloque 0 y empieza el cronómetro.
 3. **Siguiente →** (o la tecla →) avanza. Al pasar a un bloque nuevo, se desbloquea solo y cambia "quién habla".
 4. Preguntas: **Lanzar → Cerrar → Resultados**. Tecla **Q** hace ese ciclo con la pregunta sugerida.
@@ -301,12 +305,12 @@ sessions/expo-reloj/answers/{quizId_uid}   { uid, name, quizId, option, correct,
 
 **30 minutos antes**
 - [ ] Panel → **↺ Reiniciar** (borra las pruebas, vuelve al lobby).
-- [ ] Video beam: abrir `/#/presentar`, doble clic para pantalla completa, verificar que el QR se lee.
+- [ ] Video beam: entrar como **presentacion**, doble clic para pantalla completa, verificar que el QR se lee.
 - [ ] Entrar con un celular de prueba y ver que el contador de conectados sube.
 - [ ] Cargar el portátil, desactivar el modo de suspensión y las notificaciones.
 
 **Plan B si falla internet**
-- En el panel, botón **📶 En línea → 📴 Modo local**. Desde ese momento el panel y `/#/presentar` **del mismo
+- En el panel, botón **📶 En línea → 📴 Modo local**. Desde ese momento el panel y `/#/presentacion` **del mismo
   navegador** (dos pestañas o ventanas) se sincronizan sin Firestore y pueden recorrer todas las pantallas.
   Los celulares no se actualizan en este modo: la exposición sigue en el video beam.
 - Para que funcione sin internet, la página debe estar ya abierta (cargada) antes de perder la conexión.
@@ -339,11 +343,12 @@ src/
   components/timing/          <TimingDiagram /> genérico: señales, buses y relojes como datos
   components/quiz/            opciones y barras de resultados
   components/ui/              botones, sliders, tarjetas, "¿Ves?…", confeti
-  slides/block0…block4/       las 34 pantallas interactivas
+  slides/block0…block4/       las 28 pantallas interactivas
   hooks/                      useSession, useIdentity, usePresence, useQuiz, usePresenter, useAnimTime
   lib/calc.ts                 todos los cálculos (probados con Vitest)
+  presentation/               diapositivas del video beam, lobby con QR y avatares
   lib/sessionStore.ts         Firestore o modo local (plan B)
-  pages/                      Enter, Room (sala), Panel, Present
+  pages/                      Enter, Room (sala), Panel, Presentation (diapositivas), Rehearsal (ensayo)
 firestore.rules               reglas de seguridad
 tests/rules.test.ts           pruebas de reglas con el emulador
 .github/workflows/deploy.yml  publicación automática en GitHub Pages

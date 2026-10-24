@@ -22,6 +22,7 @@ export function QuizOptions({
   disabled,
   reveal,
   onPick,
+  big = false,
 }: {
   quiz: Quiz;
   selected: number | null;
@@ -29,6 +30,8 @@ export function QuizOptions({
   /** mostrar cuál es la correcta. */
   reveal?: boolean;
   onPick?: (i: number) => void;
+  /** tamaño para el video beam. */
+  big?: boolean;
 }) {
   const hasVisual = quiz.options.some((o) => o.visual);
   return (
@@ -49,7 +52,9 @@ export function QuizOptions({
             key={i}
             disabled={disabled}
             onClick={() => onPick?.(i)}
-            className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-left text-lg font-bold ring-2 transition active:scale-95 disabled:active:scale-100 ${tone}`}
+            className={`flex items-center gap-3 rounded-2xl text-left font-bold ring-2 transition active:scale-95 disabled:active:scale-100 ${
+              big ? 'px-6 py-5 text-[32px]' : 'px-4 py-3 text-lg'
+            } ${tone}`}
           >
             <span className={`grid place-items-center h-9 w-9 shrink-0 rounded-xl text-base ${isSel || isCorrect ? 'bg-white/20' : 'bg-fondo'}`}>
               {LETTERS[i]}

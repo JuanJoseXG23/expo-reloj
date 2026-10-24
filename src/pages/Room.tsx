@@ -9,6 +9,8 @@ import { useAuth } from '../hooks/useAuth';
 import { useIdentity } from '../hooks/useIdentity';
 import { useParticipants, usePresence } from '../hooks/usePresence';
 import { useSession } from '../hooks/useSession';
+import { Avatar } from '../components/Avatar';
+import { TEAM, TOPIC } from '../content/people';
 
 interface Pos {
   block: number;
@@ -58,13 +60,16 @@ export default function Room() {
   if (inLobby) {
     return (
       <main className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center gap-6 px-5 py-10 text-center">
-        <div className="text-6xl animate-bounce">⏱️</div>
-        <h1 className="text-3xl font-extrabold text-navy">Señales de reloj y diagramas de tiempo</h1>
-        <p className="text-xl font-bold text-azul">Hola, {name} 👋</p>
+        <h1 className="text-3xl font-extrabold text-navy">{TOPIC}</h1>
+        <div className="flex flex-col items-center gap-1">
+          <Avatar seed={uid ?? name} size={96} />
+          <p className="text-xl font-bold text-azul">Hola, {name} 👋</p>
+          <p className="text-sm font-semibold text-slate-500">Este es tu avatar: búscalo en el video beam</p>
+        </div>
         <div className="flex flex-wrap justify-center gap-2">
-          {['Juan José', 'Cristian', 'Renzo'].map((n) => (
-            <span key={n} className="rounded-2xl bg-white px-4 py-2 font-bold text-navy ring-1 ring-slate-200">
-              {n}
+          {TEAM.map((p) => (
+            <span key={p.short} className="rounded-2xl bg-white px-3 py-1.5 text-sm font-bold text-navy ring-1 ring-slate-200">
+              {p.full}
             </span>
           ))}
         </div>

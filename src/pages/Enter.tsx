@@ -5,6 +5,18 @@ import { cleanName, isValidName, useIdentity } from '../hooks/useIdentity';
 import { tryPresenterKey } from '../hooks/usePresenter';
 import { TimingDiagram } from '../components/timing/TimingDiagram';
 import { useAnimTime } from '../hooks/useAnimTime';
+import { COURSE, TEAM } from '../content/people';
+
+/** "Presentación", "presentacion", "PRESENTACION"… → perfil de diapositivas para el video beam. */
+export function isPresentationName(n: string): boolean {
+  return (
+    n
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim() === 'presentacion'
+  );
+}
 
 function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
   return Promise.race([p, new Promise<T>((r) => window.setTimeout(() => r(fallback), ms))]);
@@ -25,6 +37,10 @@ export default function Enter() {
     const n = cleanName(value);
     if (!isValidName(n)) {
       setError('Escribe entre 2 y 40 letras.');
+      return;
+    }
+    if (isPresentationName(n)) {
+      navigate('/presentacion');
       return;
     }
     setBusy(true);
@@ -48,7 +64,7 @@ export default function Enter() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-5 py-10">
       <div className="text-center">
-        <div className="text-sm font-bold text-azul">Sistemas Digitales y Ensambladores</div>
+        <div className="text-sm font-bold text-azul">{COURSE}</div>
         <h1 className="mt-1 text-4xl font-extrabold leading-tight text-navy">
           Señales de reloj <span className="text-naranja">⏱️</span>
         </h1>
@@ -78,7 +94,7 @@ export default function Enter() {
           {busy ? 'Entrando…' : 'Entrar →'}
         </button>
       </form>
-      <p className="text-center text-sm font-semibold text-slate-500">Juan José · Cristian · Renzo</p>
+      <p className="text-center text-sm font-semibold text-slate-500">{TEAM.map((p) => p.full).join(' · ')}</p>
     </main>
   );
 }

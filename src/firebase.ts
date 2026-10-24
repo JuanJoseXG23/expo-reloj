@@ -61,3 +61,18 @@ export function ensureAuth(): Promise<User> {
   }
   return authPromise;
 }
+
+/** Inicia una suscripción solo cuando ya hay sesión anónima (las reglas la exigen). Devuelve cómo cancelarla. */
+export function whenAuthed(start: () => () => void): () => void {
+  let unsub: (() => void) | null = null;
+  let cancelled = false;
+  ensureAuth()
+    .then(() => {
+      if (!cancelled) unsub = start();
+    })
+    .catch((e) => console.warn('Sin sesión anónima', e));
+  return () => {
+    cancelled = true;
+    unsub?.();
+  };
+}

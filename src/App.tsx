@@ -2,7 +2,8 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Enter from './pages/Enter';
 import Room from './pages/Room';
 import Panel from './pages/Panel';
-import Present from './pages/Present';
+import Presentation from './pages/Presentation';
+import Rehearsal from './pages/Rehearsal';
 import { firebaseConfigured } from './firebase';
 
 export default function App() {
@@ -17,7 +18,9 @@ export default function App() {
         <Route path="/" element={<Enter />} />
         <Route path="/sala" element={<Room />} />
         <Route path="/panel" element={<Panel />} />
-        <Route path="/presentar" element={<Present />} />
+        <Route path="/presentacion" element={<Presentation />} />
+        <Route path="/presentacion/ensayo/:id?" element={<Rehearsal />} />
+        <Route path="/presentar" element={<Navigate to="/presentacion" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>

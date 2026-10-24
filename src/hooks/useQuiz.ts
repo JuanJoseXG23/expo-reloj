@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { collection, doc, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
-import { getDb, SESSION_ID } from '../firebase';
+import { getDb, SESSION_ID, whenAuthed } from '../firebase';
 import { getQuiz } from '../content/quizzes';
 import { isLocalMode } from '../lib/sessionStore';
 import type { Answer } from '../lib/types';
@@ -38,10 +38,12 @@ export function useMyAnswer(uid: string | null, quizId: string | null) {
   useEffect(() => {
     setOption(null);
     if (!uid || !quizId || isLocalMode()) return;
-    return onSnapshot(
-      doc(answersCol(), `${quizId}_${uid}`),
-      (snap) => setOption(snap.exists() ? Number(snap.data().option) : null),
-      () => setOption(null),
+    return whenAuthed(() =>
+      onSnapshot(
+        doc(answersCol(), `${quizId}_${uid}`),
+        (snap) => setOption(snap.exists() ? Number(snap.data().option) : null),
+        () => setOption(null),
+      ),
     );
   }, [uid, quizId]);
   return option;
@@ -57,10 +59,12 @@ export function useQuizAnswers(quizId: string | null, enabled: boolean) {
   useEffect(() => {
     setAnswers([]);
     if (!quizId || !enabled || isLocalMode()) return;
-    return onSnapshot(
-      query(answersCol(), where('quizId', '==', quizId)),
-      (snap) => setAnswers(snap.docs.map((d) => toAnswer(d.data()))),
-      (e) => console.warn('No se pudieron leer respuestas', e),
+    return whenAuthed(() =>
+      onSnapshot(
+        query(answersCol(), where('quizId', '==', quizId)),
+        (snap) => setAnswers(snap.docs.map((d) => toAnswer(d.data()))),
+        (e) => console.warn('No se pudieron leer respuestas', e),
+      ),
     );
   }, [quizId, enabled]);
   return answers;
@@ -71,10 +75,12 @@ export function useAllAnswers(enabled: boolean) {
   const [answers, setAnswers] = useState<Answer[]>([]);
   useEffect(() => {
     if (!enabled || isLocalMode()) return;
-    return onSnapshot(
-      answersCol(),
-      (snap) => setAnswers(snap.docs.map((d) => toAnswer(d.data()))),
-      (e) => console.warn('No se pudieron leer respuestas', e),
+    return whenAuthed(() =>
+      onSnapshot(
+        answersCol(),
+        (snap) => setAnswers(snap.docs.map((d) => toAnswer(d.data()))),
+        (e) => console.warn('No se pudieron leer respuestas', e),
+      ),
     );
   }, [enabled]);
   return answers;
