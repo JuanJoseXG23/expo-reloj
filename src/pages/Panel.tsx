@@ -60,6 +60,8 @@ function Dashboard() {
           unlockedBlocks: unlocked,
           currentSpeaker: p.block !== S.currentBlock ? BLOCKS[p.block].speaker : S.currentSpeaker,
           status: S.status === 'lobby' ? 'live' : S.status,
+          // Al cambiar de pantalla se quita la pregunta ya cerrada o con resultados (una abierta se respeta).
+          ...(S.activeQuizId && S.quizState !== 'open' ? { activeQuizId: null, quizState: 'idle' as const } : {}),
         }),
       );
     },

@@ -20,13 +20,15 @@ export default function Presentation() {
   const isPresenter = presenter === 'yes';
   const { online } = useParticipants(!meta.local);
   const quiz = getQuiz(S.activeQuizId);
-  const showQuiz = Boolean(quiz) && S.quizState !== 'idle' && S.status === 'live';
+  const slide = getSlide(S.currentBlock, S.currentSlide);
+  // En 3.6 la diapositiva ya muestra los votos del gancho: no la tapamos.
+  const coveredBySlide = quiz?.id === 'gancho' && slide?.id === '3.6';
+  const showQuiz = Boolean(quiz) && S.quizState !== 'idle' && S.status === 'live' && !coveredBySlide;
   // Las reglas solo dejan leer respuestas ajenas en "resultados" (o siempre si este equipo es expositor).
   const answers = useQuizAnswers(quiz?.id ?? null, !meta.local && (isPresenter || S.quizState === 'results'));
   const counts = useCounts(answers, quiz?.id ?? null);
 
   const block = BLOCKS[S.currentBlock];
-  const slide = getSlide(S.currentBlock, S.currentSlide);
   const Comp = slide ? DECK[slide.id] : undefined;
   const speaker = S.currentSpeaker === 'Los tres' ? 'Los tres' : fullName(S.currentSpeaker);
 
